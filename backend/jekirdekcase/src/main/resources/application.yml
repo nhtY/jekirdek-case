@@ -1,1 +1,16 @@
-spring.application.name=jekirdekcase
+
+spring:
+  application:
+    name: jekirdekcase
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/jekirdek
+    username: developer
+    password: pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update  # or "none", "validate", "create"
+    show-sql: true  # Logs SQL queries to the console, for debugging
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
