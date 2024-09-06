@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // Use the actual database
@@ -67,6 +69,42 @@ class UserRepositoryTest {
         Optional<User> user = userRepository.findByUsernameOrEmail("janedoe", "jane.doe@example.com");
         assertThat(user).isPresent();
         assertThat(user.get().getFirstName()).isEqualTo("Jane");
+    }
+
+    @Test
+    public void testUniqueUsername() {
+        // Attempt to create a new user with the same username as user1
+        User userWithDuplicateUsername = User.builder()
+                .firstName("Duplicate")
+                .lastName("User")
+                .username("johndoe") // Same username as user1
+                .email("differentemail@example.com")
+                .password("password")
+                .build();
+
+        // Assert that saving this user throws a DataIntegrityViolationException
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            userRepository.saveAndFlush(userWithDuplicateUsername);
+        });
+    }
+
+    @Test
+    public void testUniqueEmail() {
+        // Attempt to create a new user with the same email as user2
+        User userWithDuplicateEmail = User.builder()
+                .firstName("Duplicate")
+                .lastName("User")
+                .username("differentusername") // Different username
+                .email("jane.doe@example.com") // Same email as user2
+                .password("password")
+                .build();
+
+        // Assert that saving this user throws a DataIntegrityViolationException
+        DataIntegrityViolationException ex = assertThrows(DataIntegrityViolationException.class, () -> {
+            userRepository.saveAndFlush(userWithDuplicateEmail);
+        });
+
+        System.out.println(ex.getMessage()); // could not execute statement [Duplicate entry 'jane.doe@example.com' for key 'user.UKob8kqyqqgmefl0aco34akdtpe'] [insert into user (created_at,email, ....
     }
 
     @Test
