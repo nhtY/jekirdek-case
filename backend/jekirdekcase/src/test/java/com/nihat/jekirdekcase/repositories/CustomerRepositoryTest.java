@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // Use the actual database
@@ -82,5 +84,24 @@ class CustomerRepositoryTest {
         customerRepository.deleteById(customer2.getId());
 
         assertThat(customerRepository.findById(customer2.getId())).isNotPresent();
+    }
+
+    // Test for uniqueness of email field
+    @Test
+    void testUniqueEmailConstraint() {
+        // Try to save a new customer with an email that already exists
+        Customer customerWithDuplicateEmail = Customer.builder()
+                .firstName("Duplicate")
+                .lastName("Customer")
+                .email("jack.sparrow@blackpearl.com") // Duplicate email
+                .region("Caribbean")
+                .build();
+
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
+            customerRepository.saveAndFlush(customerWithDuplicateEmail);
+        });
+
+        // Print the error message to understand the constraint violation
+        System.out.println("Error Message: " + exception.getMessage());
     }
 }
