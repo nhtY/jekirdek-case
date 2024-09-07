@@ -5,6 +5,7 @@ import com.nihat.jekirdekcase.dtos.requests.UpdateUserRequest;
 import com.nihat.jekirdekcase.dtos.responses.CreateUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.GetUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
+import com.nihat.jekirdekcase.entities.User;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
 import com.nihat.jekirdekcase.exceptions.UserNotFoundException;
 import com.nihat.jekirdekcase.mappers.UserMapper;
@@ -66,7 +67,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GetUserResponse getUser(Long id) {
-        return null;
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
+        return userMapper.mapToGetUserResponse(user);
     }
 
     @Override
