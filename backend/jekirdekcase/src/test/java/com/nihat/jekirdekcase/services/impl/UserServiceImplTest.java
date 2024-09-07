@@ -108,6 +108,14 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateUser_ShouldThrowExceptionIfUserNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserRequest, 1L));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
     void getUser_ShouldReturnGetUserResponse() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userMapper.mapToGetUserResponse(user)).thenReturn(getUserResponse);
