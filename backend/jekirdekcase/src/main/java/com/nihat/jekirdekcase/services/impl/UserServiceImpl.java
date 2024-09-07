@@ -5,7 +5,12 @@ import com.nihat.jekirdekcase.dtos.requests.UpdateUserRequest;
 import com.nihat.jekirdekcase.dtos.responses.CreateUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.GetUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
+import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
+import com.nihat.jekirdekcase.mappers.UserMapper;
+import com.nihat.jekirdekcase.repositories.UserRepository;
 import com.nihat.jekirdekcase.services.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,10 +18,36 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
     @Override
     public CreateUserResponse saveUser(CreateUserRequest createUserRequest) {
-        return null;
+        try {
+            return userMapper.mapToCreateUserResponse(userRepository.save(userMapper.mapToUser(createUserRequest)));
+        } catch (DataIntegrityViolationException e) {
+            throw throwAlreadyExistsExceptionForUserCreation(createUserRequest.username(), createUserRequest.email());
+        }
+    }
+
+    private AlreadyExistsException throwAlreadyExistsExceptionForUserCreation(String username, String email) {
+
+        boolean usernameExists = userRepository.existsByUsername(username);
+        boolean emailExists = userRepository.existsByEmail(email);
+
+        if (usernameExists && emailExists) {
+            return new AlreadyExistsException("User with this username and email already exists.");
+        } else if (usernameExists) {
+            return new AlreadyExistsException("User with this username already exists.");
+        } else if (emailExists) {
+            return new AlreadyExistsException("User with this email already exists.");
+        } else {
+            return new AlreadyExistsException("User with this username and email already exists.");
+        }
+
     }
 
     @Override
