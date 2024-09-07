@@ -80,6 +80,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<GetUserResponse> getAllUsers(Pageable pageable) {
-        return null;
+        return userRepository.findAll(pageable)
+                .map(userMapper::mapToGetUserResponse);
     }
 }
