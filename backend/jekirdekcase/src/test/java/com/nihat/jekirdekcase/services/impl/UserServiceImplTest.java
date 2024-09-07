@@ -59,7 +59,7 @@ class UserServiceImplTest {
         user.setUsername("johndoe");
 
         createUserRequest = new CreateUserRequest("John", "Doe", "johndoe", "john.doe@example.com", "password");
-        updateUserRequest = new UpdateUserRequest("John", "Doe", "john.doe@example.com", "johndoe");
+        updateUserRequest = new UpdateUserRequest("John", "Doe");
         createUserResponse = new CreateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", "2023-09-01");
         updateUserResponse = new UpdateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", null);
         getUserResponse = new GetUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", "2023-09-01", "2023-09-01");
