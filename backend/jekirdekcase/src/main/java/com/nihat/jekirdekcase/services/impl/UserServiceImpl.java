@@ -62,7 +62,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateUserResponse updateUser(UpdateUserRequest updateUserRequest, Long id) {
-        return null;
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setFirstName(updateUserRequest.firstName());
+                    user.setLastName(updateUserRequest.lastName());
+                    return userMapper.mapToUpdateUserResponse(userRepository.save(user));
+                })
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
     }
 
     @Override
