@@ -6,6 +6,7 @@ import com.nihat.jekirdekcase.dtos.responses.CreateUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.GetUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
+import com.nihat.jekirdekcase.exceptions.UserNotFoundException;
 import com.nihat.jekirdekcase.mappers.UserMapper;
 import com.nihat.jekirdekcase.repositories.UserRepository;
 import com.nihat.jekirdekcase.services.UserService;
@@ -52,7 +53,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User with ID " + id + " not found.");
+        }
+        userRepository.deleteById(id);
     }
 
     @Override
