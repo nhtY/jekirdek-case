@@ -74,7 +74,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<GetUserResponse> getAllUsers() {
-        return List.of();
+        List<User> users = userRepository.findAll();
+        return userMapper.mapToGetUserResponseList(users);
     }
 
     @Override
