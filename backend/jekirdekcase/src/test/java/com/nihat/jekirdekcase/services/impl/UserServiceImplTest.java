@@ -135,7 +135,7 @@ class UserServiceImplTest {
         Page<User> userPage = new PageImpl<>(users);
         List<GetUserResponse> userResponses = List.of(getUserResponse);
         when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
-        when(userMapper.mapToGetUserResponseList(users)).thenReturn(userResponses);
+        when(userMapper.mapToGetUserResponse(user)).thenReturn(getUserResponse);
 
         Page<GetUserResponse> responsePage = userService.getAllUsers(Pageable.unpaged());
 
