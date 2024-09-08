@@ -7,7 +7,7 @@ import com.nihat.jekirdekcase.dtos.responses.GetUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
 import com.nihat.jekirdekcase.entities.User;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
-import com.nihat.jekirdekcase.exceptions.UserNotFoundException;
+import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
 import com.nihat.jekirdekcase.mappers.UserMapper;
 import com.nihat.jekirdekcase.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,7 +90,7 @@ class UserServiceImplTest {
     void deleteUser_ShouldThrowExceptionIfUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(1L));
+        assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(1L));
         verify(userRepository, never()).deleteById(anyLong());
     }
 
@@ -111,7 +111,7 @@ class UserServiceImplTest {
     void updateUser_ShouldThrowExceptionIfUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserRequest, 1L));
+        assertThrows(ResourceNotFoundException.class, () -> userService.updateUser(updateUserRequest, 1L));
         verify(userRepository, never()).save(any(User.class));
     }
 
