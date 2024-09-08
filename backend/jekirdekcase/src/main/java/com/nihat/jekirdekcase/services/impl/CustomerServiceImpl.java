@@ -63,7 +63,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public GetCustomerResponse getCustomer(Long id) {
-        return null;
+        return  customerRepository.findById(id)
+                .map(customerMapper::mapToGetCustomerResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + id + " not found."));
     }
 
     @Override
