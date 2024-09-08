@@ -77,6 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Page<GetCustomerResponse> getAllCustomers(Pageable pageable) {
-        return null;
+        return customerRepository.findAll(pageable)
+                .map(customerMapper::mapToGetCustomerResponse);
     }
 }
