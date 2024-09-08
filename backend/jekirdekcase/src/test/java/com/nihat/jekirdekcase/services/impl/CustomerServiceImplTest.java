@@ -118,8 +118,9 @@ class CustomerServiceImplTest {
 
     @Test
     void updateCustomer_shouldThrowAlreadyExistsException_whenEmailAlreadyExists() {
+        UpdateCustomerRequest updateCustomerRequest = new UpdateCustomerRequest("Jane", "Doe", "new.email@example.com", "Ankara");
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        when(customerRepository.existsByEmail("jane.doe@example.com")).thenReturn(true);
+        when(customerRepository.existsByEmail("new.email@example.com")).thenReturn(true);
 
         AlreadyExistsException exception = assertThrows(AlreadyExistsException.class, () -> {
             customerService.updateCustomer(updateCustomerRequest, 1L);
