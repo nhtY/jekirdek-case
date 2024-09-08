@@ -151,7 +151,7 @@ class CustomerServiceImplTest {
         List<Customer> customers = List.of(customer);
         List<GetCustomerResponse> customerResponses = List.of(getCustomerResponse);
         when(customerRepository.findAll()).thenReturn(customers);
-        when(customerMapper.mapToGetCustomerResponseList(customers)).thenReturn(customerResponses);
+        when(customerMapper.mapToGetCustomerResponse(any(Customer.class))).thenReturn(getCustomerResponse);
 
         List<GetCustomerResponse> responses = customerService.getAllCustomers();
 
