@@ -6,6 +6,7 @@ import com.nihat.jekirdekcase.dtos.responses.CreateCustomerResponse;
 import com.nihat.jekirdekcase.dtos.responses.GetCustomerResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateCustomerResponse;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
+import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
 import com.nihat.jekirdekcase.mappers.CustomerMapper;
 import com.nihat.jekirdekcase.repositories.CustomerRepository;
 import com.nihat.jekirdekcase.services.CustomerService;
@@ -54,7 +55,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(Long id) {
-
+        if (!customerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Customer with ID " + id + " not found.");
+        }
+        customerRepository.deleteById(id);
     }
 
     @Override
