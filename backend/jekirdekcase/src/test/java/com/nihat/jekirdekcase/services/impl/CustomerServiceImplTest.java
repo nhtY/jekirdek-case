@@ -81,6 +81,7 @@ class CustomerServiceImplTest {
     void saveCustomer_ShouldThrowAlreadyExistsExceptionIfEmailExists() {
         when(customerMapper.mapToCustomer(createCustomerRequest)).thenReturn(customer);
         when(customerRepository.save(any(Customer.class))).thenThrow(DataIntegrityViolationException.class);
+        when(customerRepository.existsByEmail(any(String.class))).thenReturn(true);
 
         assertThrows(AlreadyExistsException.class, () -> customerService.saveCustomer(createCustomerRequest));
         verify(customerRepository, times(1)).save(any(Customer.class));
