@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -100,7 +101,7 @@ class CustomerServiceImplTest {
         when(customerRepository.save(customer)).thenReturn(customer);
         when(customerMapper.mapToUpdateCustomerResponse(customer)).thenReturn(updateCustomerResponse);
 
-        UpdateCustomerResponse response = customerService.updateCustomer(updateCustomerRequest);
+        UpdateCustomerResponse response = customerService.updateCustomer(updateCustomerRequest, 1L);
 
         assertThat(response).isEqualTo(updateCustomerResponse);
         verify(customerRepository, times(1)).save(customer);
@@ -110,7 +111,20 @@ class CustomerServiceImplTest {
     void updateCustomer_ShouldThrowExceptionIfCustomerNotFound() {
         when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> customerService.updateCustomer(updateCustomerRequest));
+        assertThrows(ResourceNotFoundException.class, () -> customerService.updateCustomer(updateCustomerRequest, 1L));
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
+    @Test
+    void updateCustomer_shouldThrowAlreadyExistsException_whenEmailAlreadyExists() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(customerRepository.existsByEmail("jane.doe@example.com")).thenReturn(true);
+
+        AlreadyExistsException exception = assertThrows(AlreadyExistsException.class, () -> {
+            customerService.updateCustomer(updateCustomerRequest, 1L);
+        });
+
+        assertEquals("Customer with this email already exists.", exception.getMessage());
         verify(customerRepository, never()).save(any(Customer.class));
     }
 
