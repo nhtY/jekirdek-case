@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CustomerService {
     CreateCustomerResponse saveCustomer(CreateCustomerRequest createCustomerRequest);
-    UpdateCustomerResponse updateCustomer(UpdateCustomerRequest updateCustomerRequest);
+    UpdateCustomerResponse updateCustomer(UpdateCustomerRequest updateCustomerRequest, Long id);
     void deleteCustomer(Long id);
     GetCustomerResponse getCustomer(Long id);
     List<GetCustomerResponse> getAllCustomers();
