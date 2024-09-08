@@ -70,7 +70,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<GetCustomerResponse> getAllCustomers() {
-        return List.of();
+        return customerRepository.findAll().stream()
+                .map(customerMapper::mapToGetCustomerResponse)
+                .toList();
     }
 
     @Override
