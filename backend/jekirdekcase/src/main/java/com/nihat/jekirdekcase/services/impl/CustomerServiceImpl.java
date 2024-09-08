@@ -50,7 +50,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public UpdateCustomerResponse updateCustomer(UpdateCustomerRequest updateCustomerRequest, Long id) {
-        return null;
+        return customerRepository.findById(id)
+                .map(customer -> {
+                    if (!customer.getEmail().equals(updateCustomerRequest.email()) && customerRepository.existsByEmail(updateCustomerRequest.email())) {
+                        throw new AlreadyExistsException("Customer with this email already exists.");
+                    }
+                    customer.setFirstName(updateCustomerRequest.firstName());
+                    customer.setLastName(updateCustomerRequest.lastName());
+                    customer.setEmail(updateCustomerRequest.email() + "asd");
+                    return customerMapper.mapToUpdateCustomerResponse(customerRepository.save(customer));
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + id + " not found."));
     }
 
     @Override
