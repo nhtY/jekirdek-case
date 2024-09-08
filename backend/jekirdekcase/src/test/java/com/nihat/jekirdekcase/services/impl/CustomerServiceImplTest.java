@@ -140,6 +140,13 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void getCustomer_ShouldThrowExceptionIfCustomerNotFound() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> customerService.getCustomer(1L));
+    }
+
+    @Test
     void getAllCustomers_ShouldReturnListOfGetCustomerResponses() {
         List<Customer> customers = List.of(customer);
         List<GetCustomerResponse> customerResponses = List.of(getCustomerResponse);
