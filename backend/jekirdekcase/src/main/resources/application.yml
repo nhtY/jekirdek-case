@@ -13,4 +13,11 @@ spring:
       ddl-auto: update  # or "none", "validate", "create"
     show-sql: true  # Logs SQL queries to the console, for debugging
     database-platform: org.hibernate.dialect.MySQL8Dialect
+    #properties:
+      #hibernate:
+        #format_sql: true  # if true Format SQL queries for better readability
 
+# Enable logging of JDBC parameters
+#logging:
+  #level:
+    #org.hibernate.type.descriptor.sql: DEBUG
