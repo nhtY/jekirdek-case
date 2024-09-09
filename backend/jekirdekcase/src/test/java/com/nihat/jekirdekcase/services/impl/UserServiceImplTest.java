@@ -7,7 +7,7 @@ import com.nihat.jekirdekcase.dtos.responses.GetUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
 import com.nihat.jekirdekcase.entities.User;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
-import com.nihat.jekirdekcase.exceptions.UserNotFoundException;
+import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
 import com.nihat.jekirdekcase.mappers.UserMapper;
 import com.nihat.jekirdekcase.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,9 +61,9 @@ class UserServiceImplTest {
 
         createUserRequest = new CreateUserRequest("John", "Doe", "johndoe", "john.doe@example.com", "password");
         updateUserRequest = new UpdateUserRequest("John", "Doe");
-        createUserResponse = new CreateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", "2023-09-01");
-        updateUserResponse = new UpdateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", null);
-        getUserResponse = new GetUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", "2023-09-01", "2023-09-01");
+        createUserResponse = new CreateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", LocalDateTime.of(2024, 9, 1, 0, 0));
+        updateUserResponse = new UpdateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", LocalDateTime.of(2024, 9, 1, 0, 0));
+        getUserResponse = new GetUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", LocalDateTime.of(2024, 9, 1, 0, 0), LocalDateTime.of(2024, 9, 1, 0, 0));
     }
 
     @Test
@@ -90,7 +91,7 @@ class UserServiceImplTest {
     void deleteUser_ShouldThrowExceptionIfUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(1L));
+        assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(1L));
         verify(userRepository, never()).deleteById(anyLong());
     }
 
@@ -111,7 +112,7 @@ class UserServiceImplTest {
     void updateUser_ShouldThrowExceptionIfUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(updateUserRequest, 1L));
+        assertThrows(ResourceNotFoundException.class, () -> userService.updateUser(updateUserRequest, 1L));
         verify(userRepository, never()).save(any(User.class));
     }
 

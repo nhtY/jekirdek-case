@@ -7,7 +7,7 @@ import com.nihat.jekirdekcase.dtos.responses.GetUserResponse;
 import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
 import com.nihat.jekirdekcase.entities.User;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
-import com.nihat.jekirdekcase.exceptions.UserNotFoundException;
+import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
 import com.nihat.jekirdekcase.mappers.UserMapper;
 import com.nihat.jekirdekcase.repositories.UserRepository;
 import com.nihat.jekirdekcase.services.UserService;
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User with ID " + id + " not found.");
+            throw new ResourceNotFoundException("User with ID " + id + " not found.");
         }
         userRepository.deleteById(id);
     }
@@ -68,13 +68,13 @@ public class UserServiceImpl implements UserService {
                     user.setLastName(updateUserRequest.lastName());
                     return userMapper.mapToUpdateUserResponse(userRepository.save(user));
                 })
-                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " not found."));
     }
 
     @Override
     public GetUserResponse getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " not found."));
         return userMapper.mapToGetUserResponse(user);
     }
 
