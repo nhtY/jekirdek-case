@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #resultsTable {
+            margin-top: 20px;
+        }
+
+        .customer {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .incoming-row {
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        #counter {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html">Customer Filter</a>
+    <h1>Customer Stream</h1>
+
+    <!-- Input form to take query parameters from the user -->
+    <form id="queryForm">
+        <label for="region">Region:</label>
+        <input type="text" id="region" name="region" placeholder="Enter region"><br><br>
+
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" placeholder="Enter first name"><br><br>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" placeholder="Enter last name"><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" placeholder="Enter email"><br><br>
+
+        <button type="button" onclick="getCustomers()">Get</button>
+        <button type="button" onclick="clearTable()">Clear</button>
+    </form>
+
+    <!-- Counter to show the number of customers received -->
+    <div id="counter">Customers received: 0</div>
+
+    <!-- Table to display results -->
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Region</th>
+                <th>Registration Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Filtered results will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        let eventSource = null;
+        let customerCount = 0;
+
+        function getCustomers() {
+            // Close previous SSE connection if open
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            // Get query parameters from the input fields
+            const region = document.getElementById('region').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+
+            // Construct URL with query parameters
+            const url = `http://localhost:8080/api/v1/customers/stream?region=${encodeURIComponent(region)}&firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}&email=${encodeURIComponent(email)}`;
+
+            // Initialize SSE with the new URL
+            eventSource = new EventSource(url);
+
+            // Clear previous results
+            clearTable();
+
+            // Listen for incoming data
+            eventSource.onmessage = function(event) {
+                const customer = JSON.parse(event.data);
+                addCustomerToTable(customer);
+            };
+
+            // Handle errors
+            eventSource.onerror = function(e) {
+                console.error('Error occurred while receiving SSE data.', e);
+                eventSource.close();
+            };
+        }
+
+        function addCustomerToTable(customer) {
+            const tableBody = document.querySelector('#resultsTable tbody');
+            const row = document.createElement('tr');
+            row.classList.add('incoming-row');
+            row.innerHTML = `
+                <td>${customer.firstName}</td>
+                <td>${customer.lastName}</td>
+                <td>${customer.email}</td>
+                <td>${customer.region}</td>
+                <td>${new Date(customer.registrationDate).toLocaleDateString()}</td>
+            `;
+            tableBody.appendChild(row);
+
+            // Increment the customer count
+            customerCount++;
+            updateCounter();
+        }
+
+        function clearTable() {
+            const tableBody = document.querySelector('#resultsTable tbody');
+            tableBody.innerHTML = '';
+            customerCount = 0;
+            updateCounter();
+        }
+
+        function updateCounter() {
+            document.getElementById('counter').innerText = `Customers received: ${customerCount}`;
+        }
+    </script>
+</body>
+</html>
