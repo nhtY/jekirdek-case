@@ -8,6 +8,7 @@ import com.nihat.jekirdekcase.dtos.responses.UpdateUserResponse;
 import com.nihat.jekirdekcase.entities.User;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
 import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
+import com.nihat.jekirdekcase.logging.Loggable;
 import com.nihat.jekirdekcase.mappers.UserMapper;
 import com.nihat.jekirdekcase.repositories.UserRepository;
 import com.nihat.jekirdekcase.services.UserService;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Loggable
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
