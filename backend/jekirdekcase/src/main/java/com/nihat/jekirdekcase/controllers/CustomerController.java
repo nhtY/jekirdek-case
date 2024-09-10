@@ -11,9 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -52,5 +57,34 @@ public class CustomerController implements CustomerControllerDocs {
     @Override
     public ResponseEntity<Page<GetCustomerResponse>> getAllCustomers(Pageable pageable) {
         return ResponseEntity.ok(customerService.getAllCustomers(pageable));
+    }
+
+    @GetMapping("/stream")
+    public SseEmitter streamCustomers(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) LocalDate registrationDateStart,
+            @RequestParam(required = false) LocalDate registrationDateEnd) {
+        // Delegate to service layer to stream customers
+        return customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd);
+    }
+
+    @Override
+    public ResponseEntity<StreamingResponseBody> filterCustomers(String firstName, String lastName, String email,
+                                                                 String region, LocalDate registrationDateStart,
+                                                                 LocalDate registrationDateEnd) {
+        // StreamingResponseBody that streams the filtered customers
+        StreamingResponseBody stream = outputStream -> {
+            customerService.streamFilteredCustomers(firstName, lastName, email, region,
+                    registrationDateStart, registrationDateEnd, outputStream);
+            outputStream.flush();
+            outputStream.close();
+        };
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(stream);
     }
 }
