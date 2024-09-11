@@ -3,6 +3,7 @@ package com.nihat.jekirdekcase.controllers;
 import com.nihat.jekirdekcase.dtos.responses.ErrorResponse;
 import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
 import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -59,16 +60,29 @@ public class CustomExceptionHandler {
          return new ResponseEntity<>(new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), errorList.toString()), HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ResponseBody
-//    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
-//        ErrorResponse errorResponse = new ErrorResponse(
-//                LocalDateTime.now(),
-//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-//                "An unexpected error occurred."
-//        );
-//        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @ExceptionHandler(PropertyReferenceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handlePropertyReferenceException(PropertyReferenceException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "An unexpected error occurred."
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
