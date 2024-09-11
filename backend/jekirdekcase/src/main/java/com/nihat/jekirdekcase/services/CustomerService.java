@@ -23,9 +23,13 @@ public interface CustomerService {
 
     void streamFilteredCustomers(String firstName, String lastName, String email, String region,
                                  LocalDate registrationDateStart, LocalDate registrationDateEnd,
-                                 OutputStream outputStream);
+                                 String sortOrder, String sortBy, OutputStream outputStream);
 
     SseEmitter streamFilteredCustomers(String firstName, String lastName, String email, String region,
-                                              LocalDate registrationDateStart, LocalDate registrationDateEnd);
+                                              LocalDate registrationDateStart, LocalDate registrationDateEnd,
+                                              String sortBy, String sortOrder);
 
+    Page<GetCustomerResponse> getFilteredCustomers(String firstName, String lastName, String email, String region,
+                                        LocalDate registrationDateStart, LocalDate registrationDateEnd,
+                                        Pageable pageable);
     }
