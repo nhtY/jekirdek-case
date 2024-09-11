@@ -59,26 +59,29 @@ public class CustomerController implements CustomerControllerDocs {
         return ResponseEntity.ok(customerService.getAllCustomers(pageable));
     }
 
-    @GetMapping("/stream")
+    @Override
     public SseEmitter streamCustomers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String region,
             @RequestParam(required = false) LocalDate registrationDateStart,
-            @RequestParam(required = false) LocalDate registrationDateEnd) {
+            @RequestParam(required = false) LocalDate registrationDateEnd,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder) {
         // Delegate to service layer to stream customers
-        return customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd);
+        return customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, sortBy, sortOrder);
     }
 
     @Override
     public ResponseEntity<StreamingResponseBody> filterCustomers(String firstName, String lastName, String email,
                                                                  String region, LocalDate registrationDateStart,
-                                                                 LocalDate registrationDateEnd) {
+                                                                 LocalDate registrationDateEnd,
+                                                                 String sortBy, String sortOrder) {
         // StreamingResponseBody that streams the filtered customers
         StreamingResponseBody stream = outputStream -> {
             customerService.streamFilteredCustomers(firstName, lastName, email, region,
-                    registrationDateStart, registrationDateEnd, outputStream);
+                    registrationDateStart, registrationDateEnd, sortBy, sortOrder, outputStream);
             outputStream.flush();
             outputStream.close();
         };
@@ -86,5 +89,15 @@ public class CustomerController implements CustomerControllerDocs {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/json")
                 .body(stream);
+    }
+
+    @Override
+    public Page<GetCustomerResponse> getFilteredCustomers(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<GetCustomerResponse> getFilteredCustomersWithSpecs(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+        return customerService.getFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, pageable);
     }
 }
