@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.LocalDate;
@@ -202,8 +203,160 @@ public interface CustomerControllerDocs {
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
+            summary = "Stream customers",
+            description = "This endpoint allows you to stream customers.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "firstName",
+                            description = "First name of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "lastName",
+                            description = "Last name of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "email",
+                            description = "Email of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "region",
+                            description = "Region of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "registrationDateStart",
+                            description = "Start date of the registration",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string", format = "date")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "registrationDateEnd",
+                            description = "End date of the registration",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string", format = "date")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "sortBy",
+                            description = "Sort by field",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "sortOrder",
+                            description = "Sort order",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Customers streamed successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = GetCustomerResponse.class)
+                            )
+                    )
+            }
+    )
+    @GetMapping("/stream")
+    SseEmitter streamCustomers(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) LocalDate registrationDateStart,
+            @RequestParam(required = false) LocalDate registrationDateEnd,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder);
+    // -----------------------------------------------------------------------------------------------------------------
+
+    @Operation(
             summary = "Filter customers",
             description = "This endpoint allows you to filter customers.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "firstName",
+                            description = "First name of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "lastName",
+                            description = "Last name of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "email",
+                            description = "Email of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "region",
+                            description = "Region of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "registrationDateStart",
+                            description = "Start date of the registration",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string", format = "date")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "registrationDateEnd",
+                            description = "End date of the registration",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string", format = "date")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "sortBy",
+                            description = "Sort by field",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "sortOrder",
+                            description = "Sort order",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Customers filtered successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = GetCustomerResponse.class)
+                            )
+                    )
+            }
+    )
+    @GetMapping("/filter")
+    ResponseEntity<StreamingResponseBody> filterCustomers(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) LocalDate registrationDateStart,
+            @RequestParam(required = false) LocalDate registrationDateEnd,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder);
+    // -----------------------------------------------------------------------------------------------------------------
+
+    @Operation(
+            summary = "Get filtered customers",
+            description = "This endpoint allows you to get filtered customers.",
             parameters = {
                     @io.swagger.v3.oas.annotations.Parameter(
                             name = "firstName",
@@ -253,14 +406,77 @@ public interface CustomerControllerDocs {
                     )
             }
     )
-    @GetMapping("/filter")
-    public ResponseEntity<StreamingResponseBody> filterCustomers(
+    @GetMapping("/filter/page")
+    Page<GetCustomerResponse> getFilteredCustomers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String region,
             @RequestParam(required = false) LocalDate registrationDateStart,
-            @RequestParam(required = false) LocalDate registrationDateEnd);
+            @RequestParam(required = false) LocalDate registrationDateEnd,
+            Pageable pageable);
     // -----------------------------------------------------------------------------------------------------------------
 
+    @Operation(
+            summary = "Get filtered customers with specs",
+            description = "This endpoint allows you to get filtered customers with specs.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "firstName",
+                            description = "First name of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "lastName",
+                            description = "Last name of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "email",
+                            description = "Email of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "region",
+                            description = "Region of the customer",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "registrationDateStart",
+                            description = "Start date of the registration",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string", format = "date")
+                    ),
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "registrationDateEnd",
+                            description = "End date of the registration",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "string", format = "date")
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Customers filtered successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = GetCustomerResponse.class)
+                            )
+                    )
+            }
+    )
+    @GetMapping("/filter/specs/page")
+    Page<GetCustomerResponse> getFilteredCustomersWithSpecs(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) LocalDate registrationDateStart,
+            @RequestParam(required = false) LocalDate registrationDateEnd,
+            Pageable pageable);
+    // -----------------------------------------------------------------------------------------------------------------
 }
