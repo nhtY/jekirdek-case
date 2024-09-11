@@ -1,6 +1,5 @@
 package com.nihat.jekirdekcase.IT;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nihat.jekirdekcase.dtos.responses.GetCustomerResponse;
 import com.nihat.jekirdekcase.entities.Customer;
@@ -65,7 +64,7 @@ public class CustomerRepositoryServiceIntegrationTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // Stream filtered customers
-        customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, outputStream);
+        customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, "id", "asc", outputStream);
 
         String output = outputStream.toString();
         // Assert that filtered customers are correctly written to the output stream
@@ -87,7 +86,7 @@ public class CustomerRepositoryServiceIntegrationTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // Stream filtered customers
-        customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, outputStream);
+        customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, "id", "asc" , outputStream);
 
 
         String output = outputStream.toString();
@@ -109,7 +108,7 @@ public class CustomerRepositoryServiceIntegrationTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // Stream filtered customers
-        customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, outputStream);
+        customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, "id", "asc" , outputStream);
 
         String output = outputStream.toString();
 
