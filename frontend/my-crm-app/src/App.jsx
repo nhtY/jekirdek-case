@@ -6,18 +6,21 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import AppNavbar from './components/Navbar';
 import Footer from './components/Footer';
 import AppRoutes from './routes';
+import AuthProvider from './context/AuthContext';
 
 const App = () => {
     return (
-        <Router>
-            <div className="d-flex flex-column min-vh-100">
-                <AppNavbar />
-                <main className="flex-fill">
-                    <AppRoutes />
-                </main>
-                <Footer />
-            </div>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <div className="d-flex flex-column min-vh-100">
+                    <AppNavbar />
+                    <main className="flex-fill">
+                        <AppRoutes />
+                    </main>
+                    <Footer />
+                </div>
+            </Router>
+        </AuthProvider>
     );
 };
 
