@@ -91,10 +91,6 @@ public class CustomerController implements CustomerControllerDocs {
                 .body(stream);
     }
 
-    @Override
-    public Page<GetCustomerResponse> getFilteredCustomers(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
-        return null;
-    }
 
     @Override
     public Page<GetCustomerResponse> getFilteredCustomersWithSpecs(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {

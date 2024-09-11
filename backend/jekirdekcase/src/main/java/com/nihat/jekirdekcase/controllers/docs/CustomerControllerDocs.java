@@ -203,7 +203,7 @@ public interface CustomerControllerDocs {
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
-            summary = "Stream customers",
+            summary = "Stream customers via Server-Sent Events",
             description = "This endpoint allows you to stream customers.",
             parameters = {
                     @io.swagger.v3.oas.annotations.Parameter(
@@ -266,7 +266,7 @@ public interface CustomerControllerDocs {
                     )
             }
     )
-    @GetMapping("/stream")
+    @GetMapping("/filter/sse")
     SseEmitter streamCustomers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -279,7 +279,7 @@ public interface CustomerControllerDocs {
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
-            summary = "Filter customers",
+            summary = "Filter customers with streaming response body",
             description = "This endpoint allows you to filter customers.",
             parameters = {
                     @io.swagger.v3.oas.annotations.Parameter(
@@ -342,7 +342,7 @@ public interface CustomerControllerDocs {
                     )
             }
     )
-    @GetMapping("/filter")
+    @GetMapping("/filter/streaming-response-body")
     ResponseEntity<StreamingResponseBody> filterCustomers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -355,70 +355,7 @@ public interface CustomerControllerDocs {
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
-            summary = "Get filtered customers",
-            description = "This endpoint allows you to get filtered customers.",
-            parameters = {
-                    @io.swagger.v3.oas.annotations.Parameter(
-                            name = "firstName",
-                            description = "First name of the customer",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "string")
-                    ),
-                    @io.swagger.v3.oas.annotations.Parameter(
-                            name = "lastName",
-                            description = "Last name of the customer",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "string")
-                    ),
-                    @io.swagger.v3.oas.annotations.Parameter(
-                            name = "email",
-                            description = "Email of the customer",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "string")
-                    ),
-                    @io.swagger.v3.oas.annotations.Parameter(
-                            name = "region",
-                            description = "Region of the customer",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "string")
-                    ),
-                    @io.swagger.v3.oas.annotations.Parameter(
-                            name = "registrationDateStart",
-                            description = "Start date of the registration",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "string", format = "date")
-                    ),
-                    @io.swagger.v3.oas.annotations.Parameter(
-                            name = "registrationDateEnd",
-                            description = "End date of the registration",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "string", format = "date")
-                    )
-            },
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Customers filtered successfully",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = GetCustomerResponse.class)
-                            )
-                    )
-            }
-    )
-    @GetMapping("/filter/page")
-    Page<GetCustomerResponse> getFilteredCustomers(
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String region,
-            @RequestParam(required = false) LocalDate registrationDateStart,
-            @RequestParam(required = false) LocalDate registrationDateEnd,
-            Pageable pageable);
-    // -----------------------------------------------------------------------------------------------------------------
-
-    @Operation(
-            summary = "Get filtered customers with specs",
+            summary = "Get filtered customers with Spring Data JPA's Specifications",
             description = "This endpoint allows you to get filtered customers with specs.",
             parameters = {
                     @io.swagger.v3.oas.annotations.Parameter(
