@@ -5,7 +5,7 @@ const AdminDashboard = () => {
     return (
         <div className="d-flex" style={{ minHeight: '100vh' }}>
             <Sidebar />
-            <div className="p-3 flex-grow-1">
+            <div className="container-fluid container-xxl">
                 <h2>Admin Dashboard</h2>
                 {/* Main content*/}
                 <Outlet />
