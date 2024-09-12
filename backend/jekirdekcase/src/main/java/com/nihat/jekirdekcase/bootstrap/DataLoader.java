@@ -38,11 +38,14 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) {
-       insertTwoThousandCustomers();
+        insertRoles();
+        insertUsers();
+        insertTwoThousandCustomers();
     }
 
-    private void insertRoles() {
+    protected void insertRoles() {
         log.info("attempting to insert roles...");
         if (roleRepository.count() == 0) {
             log.info("Inserting roles...");
@@ -57,8 +60,8 @@ public class DataLoader implements CommandLineRunner {
         }
     }
 
-    @Transactional
-    protected void insertUsers() {
+
+    private void insertUsers() {
         log.info("attempting to insert users...");
         if (userRepository.count() == 0) {
             insertRoles();
