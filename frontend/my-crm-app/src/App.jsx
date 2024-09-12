@@ -14,7 +14,7 @@ const App = () => {
             <Router>
                 <div className="d-flex flex-column min-vh-100">
                     <AppNavbar />
-                    <main className="flex-fill">
+                    <main className="vh-100">
                         <AppRoutes />
                     </main>
                     <Footer />
