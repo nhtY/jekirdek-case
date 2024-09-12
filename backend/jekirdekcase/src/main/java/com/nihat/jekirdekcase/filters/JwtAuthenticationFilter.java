@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nihat.jekirdekcase.auth.CustomUserDetails;
 import com.nihat.jekirdekcase.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
         String token = jwtUtil.generateToken(userDetails);
-        response.setHeader("Authorization", "Bearer " + token);
+
+        // Determine client type
+        String deviceOs = request.getHeader("device-os");
+        if (deviceOs != null && deviceOs.contains("Browser")) {
+            // For browser clients, set the token in a cookie
+            response.addCookie(jwtUtil.createCookie(token, jwtUtil.getCookieName(), jwtUtil.getCookieMaxAge()));
+        } else {
+            // For non-browser clients, set the token in the Authorization header
+            response.setHeader("Authorization", "Bearer " + token);
+        }
+
+        chain.doFilter(request, response);
     }
 }
