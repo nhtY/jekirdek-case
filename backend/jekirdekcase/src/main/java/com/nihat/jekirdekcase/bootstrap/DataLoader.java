@@ -1,16 +1,23 @@
 package com.nihat.jekirdekcase.bootstrap;
 
 
+import com.nihat.jekirdekcase.entities.AppRole;
 import com.nihat.jekirdekcase.entities.Customer;
+import com.nihat.jekirdekcase.entities.User;
 import com.nihat.jekirdekcase.logging.Loggable;
+import com.nihat.jekirdekcase.repositories.AppRoleRepository;
 import com.nihat.jekirdekcase.repositories.CustomerRepository;
+import com.nihat.jekirdekcase.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 @Component
@@ -19,18 +26,72 @@ import java.util.ArrayList;
 public class DataLoader implements CommandLineRunner {
 
     private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
+    private final AppRoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(CustomerRepository customerRepository) {
+    public DataLoader(CustomerRepository customerRepository, UserRepository userRepository, AppRoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.customerRepository = customerRepository;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
-       insertOneThousandCustomers();
+       insertTwoThousandCustomers();
     }
 
-    private void insertOneThousandCustomers() {
+    private void insertRoles() {
+        log.info("attempting to insert roles...");
+        if (roleRepository.count() == 0) {
+            log.info("Inserting roles...");
+            // Define a list of roles
+            List<AppRole> roles = List.of(
+                AppRole.builder().roleName("ROLE_USER").build(),
+                    AppRole.builder().roleName("ROLE_ADMIN").build()
+            );
 
+            roleRepository.saveAll(roles);
+            log.info("Inserted roles.");
+        }
+    }
+
+    @Transactional
+    protected void insertUsers() {
+        log.info("attempting to insert users...");
+        if (userRepository.count() == 0) {
+            insertRoles();
+            log.info("Inserting users...");
+            // Define a list of users
+            List<User> users = List.of(
+                User.builder()
+                        .firstName("admin")
+                        .lastName("admin")
+                        .username("admin")
+                        .email("admin@email.com")
+                        .password(passwordEncoder.encode("admin"))
+                        .roles(Set.of(roleRepository.findByRoleName("ROLE_ADMIN")))
+                        .build(),
+                    User.builder()
+                        .firstName("user")
+                        .lastName("user")
+                        .username("user")
+                        .email("user@email.com")
+                        .password(passwordEncoder.encode("user"))
+                        .roles(Set.of(roleRepository.findByRoleName("ROLE_USER")))
+                        .build());
+
+            userRepository.saveAll(users);
+
+        }
+
+
+    }
+
+
+    private void insertTwoThousandCustomers() {
+        log.info("attempting to insert 2 thousand customers...");
         if (customerRepository.count() == 0) {
             log.info("Inserting 2 thousand customers...");
             // Define lists of names, surnames, regions, and email domains
@@ -72,8 +133,7 @@ public class DataLoader implements CommandLineRunner {
                 customerRepository.saveAll(customers);
             }
 
-            System.out.println("Inserted 1 thousand customers.");
+            System.out.println("Inserted 2 thousand customers.");
         }
-        log.info("Some customers already exist in the database.");
     }
 }
