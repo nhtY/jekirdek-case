@@ -58,6 +58,13 @@
 			<version>0.9.1</version>
 		</dependency>
 
+		<!-- Due to Caused by: java.lang.ClassNotFoundException: javax.xml.bind.DatatypeConverter while creation JWT-->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.1</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
