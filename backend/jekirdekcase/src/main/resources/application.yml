@@ -18,6 +18,8 @@ spring:
         #format_sql: true  # if true Format SQL queries for better readability
 
 # Enable logging of JDBC parameters
-#logging:
-  #level:
+logging:
+  level:
+    com.nihat.jekirdekcase: DEBUG
+    org.springframework.security: DEBUG
     #org.hibernate.type.descriptor.sql: DEBUG
