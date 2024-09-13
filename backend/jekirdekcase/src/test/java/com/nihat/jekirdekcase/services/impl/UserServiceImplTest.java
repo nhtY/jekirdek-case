@@ -59,7 +59,7 @@ class UserServiceImplTest {
         user.setEmail("john.doe@example.com");
         user.setUsername("johndoe");
 
-        createUserRequest = new CreateUserRequest("John", "Doe", "johndoe", "john.doe@example.com", "password");
+        createUserRequest = new CreateUserRequest("John", "Doe", "johndoe", "john.doe@example.com", "password", "ROLE_USER");
         updateUserRequest = new UpdateUserRequest("John", "Doe");
         createUserResponse = new CreateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", LocalDateTime.of(2024, 9, 1, 0, 0));
         updateUserResponse = new UpdateUserResponse(1L, "John", "Doe", "johndoe", "john.doe@example.com", LocalDateTime.of(2024, 9, 1, 0, 0));
