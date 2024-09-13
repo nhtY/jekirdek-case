@@ -1,108 +1,149 @@
-import { useState } from 'react';
-import IconButtonWithToolTip from '../components/IconButtonWithToolTip';
-import { faPencilAlt, faTrash, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
-import ConfirmationModal from '../components/ConfirmationModal';
-
-// A utility function for basic validation
-const validateEmail = (email) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
-};
-
-const validateName = (name) => {
-  return name.length >= 3 && /^[A-Za-z]+$/.test(name);
-};
+import { useEffect, useState } from "react";
+import axios from "../axios/axios";
+import { Modal, Button } from "react-bootstrap";
+import IconButtonWithToolTip from "../components/IconButtonWithToolTip"; // Assume you have a component for tooltips
+import {
+  faPencilAlt,
+  faTrash,
+  faCheck,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
+import ConfirmationModal from "../components/ConfirmationModal"; // Assume you have a confirmation modal component
 
 const ListUsersPage = () => {
-  // Initial list of users
-  const initialUsers = [
-    { id: 1, firstName: 'Jane', lastName: 'Doe', username: 'janedoe', email: 'jane.doe@example.com' },
-    { id: 2, firstName: 'John', lastName: 'Smith', username: 'johnsmith', email: 'john.smith@example.com' },
-  ];
-
-  const [users, setUsers] = useState(initialUsers);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
-  const [editingId, setEditingId] = useState(null);
-  const [errors, setErrors] = useState({});
-  const [editedData, setEditedData] = useState({
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: ''
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [sort, setSort] = useState("");
+  const [error, setError] = useState(null);
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [deleteUserId, setDeleteUserId] = useState(null);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
   });
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // Handle Delete Operation
-  const handleDelete = (id) => {
-    setDeleteId(id);
-    setShowConfirm(true);
+  const handleCloseErrorModal = () => setShowErrorModal(false);
+  const handleCloseConfirmModal = () => setShowConfirmModal(false);
+
+  const fetchUsers = async (pageNumber, size, sort) => {
+    try {
+      const response = await axios.get("/users/page", {
+        params: {
+          page: pageNumber,
+          size: size,
+          sort: sort ? sort : [],
+        },
+      });
+      setUsers(response.data.content);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error("FETCH ERROR: ", error);
+      setError("Failed to load users.");
+      setShowErrorModal(true);
+    }
   };
 
-  const confirmDelete = () => {
-    setUsers(users.filter(user => user.id !== deleteId));
-    setShowConfirm(false);
-    setDeleteId(null);
-  };
-
-  // Handle Update Operation
-  const handleUpdate = (user) => {
-    setEditingId(user.id);
-    setEditedData({
+  const handleEditClick = (user) => {
+    setEditingUserId(user.id);
+    setFormData({
       firstName: user.firstName,
       lastName: user.lastName,
-      username: user.username,
-      email: user.email,
     });
   };
 
-  const cancelUpdate = () => {
-    setEditingId(null);
-    setErrors({});
-    setEditedData({
-      firstName: '',
-      lastName: '',
-      username: '',
-      email: ''
+  const handleCancelEdit = () => {
+    setEditingUserId(null);
+    setFormData({
+      firstName: "",
+      lastName: "",
     });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!validateName(editedData.firstName)) {
-      newErrors.firstName = 'First name must be at least 3 letters and contain only letters.';
+  const handleSaveUser = async (id) => {
+    try {
+      const response = await axios.put(`/users/${id}`, formData);
+      const updatedUsers = users.map((user) =>
+        user.id === id ? { ...user, ...response.data } : user
+      );
+      setUsers(updatedUsers);
+      setEditingUserId(null);
+    } catch (error) {
+      setError("Failed to update user.");
+      setShowErrorModal(true);
     }
-    if (!validateName(editedData.lastName)) {
-      newErrors.lastName = 'Last name must be at least 3 letters and contain only letters.';
-    }
-    if (!validateEmail(editedData.email)) {
-      newErrors.email = 'Please enter a valid email address.';
-    }
-    if (editedData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters long.';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  const confirmUpdate = () => {
-    if (validateForm()) {
-      setUsers(users.map((user) =>
-        user.id === editingId
-          ? { ...user, ...editedData }
-          : user
-      ));
-      setEditingId(null);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeleteUserId(id);
+    setShowConfirmModal(true); // Show confirmation modal
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`/users/${deleteUserId}`);
+      setUsers(users.filter((user) => user.id !== deleteUserId));
+      setDeleteUserId(null);
+      setShowConfirmModal(false);
+    } catch (error) {
+      setError("Failed to delete user.");
+      setShowErrorModal(true);
     }
   };
+
+  useEffect(() => {
+    fetchUsers(page, pageSize, sort);
+  }, [page, pageSize, sort]);
 
   return (
-    <div>
-      <h2>List Users</h2>
+    <div className="container-fluid">
+      <h3>User List</h3>
+
+      <div className="row mb-3">
+        <div className="col">
+          <label>Page Size: </label>
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(e.target.value)}
+            className="form-control w-auto"
+          >
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+          </select>
+        </div>
+
+        <div className="col">
+          <label>Sort By: </label>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="form-control w-auto"
+          >
+            <option value="">None</option>
+            <option value="firstName,asc">First Name Ascending</option>
+            <option value="firstName,desc">First Name Descending</option>
+            <option value="lastName,asc">Last Name Ascending</option>
+            <option value="lastName,desc">Last Name Descending</option>
+          </select>
+        </div>
+      </div>
+
       <div className="table-responsive">
-        <table className="table table-striped table-bordered table-hover">
-          <thead className="table-dark">
+        <table className="table table-sm table-striped table-bordered table-hover">
+        <thead className="table-dark">
             <tr>
-              <th scope="col">ID</th>
               <th scope="col">First Name</th>
               <th scope="col">Last Name</th>
               <th scope="col">Username</th>
@@ -110,98 +151,116 @@ const ListUsersPage = () => {
               <th scope="col">Actions</th>
             </tr>
           </thead>
-          <tbody className="table-group-divider">
+          <tbody>
             {users.map((user) => (
-              <tr key={user.id} className={editingId === user.id ? 'table-warning' : ''}>
-                <td scope="row">{user.id}</td>
-                {editingId === user.id ? (
-                  <>
-                    <td>
-                      <input
-                        type="text"
-                        value={editedData.firstName}
-                        onChange={(e) => setEditedData({ ...editedData, firstName: e.target.value })}
-                        className={errors.firstName ? 'is-invalid' : ''}
-                      />
-                      {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={editedData.lastName}
-                        onChange={(e) => setEditedData({ ...editedData, lastName: e.target.value })}
-                        className={errors.lastName ? 'is-invalid' : ''}
-                      />
-                      {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={editedData.username}
-                        onChange={(e) => setEditedData({ ...editedData, username: e.target.value })}
-                        className={errors.username ? 'is-invalid' : ''}
-                      />
-                      {errors.username && <div className="invalid-feedback">{errors.username}</div>}
-                    </td>
-                    <td>
-                      <input
-                        type="email"
-                        value={editedData.email}
-                        onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
-                        className={errors.email ? 'is-invalid' : ''}
-                      />
-                      {errors.email && <div className="invalid-feedback">{errors.email}</div>}
-                    </td>
-                    <td>
+              <tr key={user.id}>
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    user.firstName
+                  )}
+                </td>
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    user.lastName
+                  )}
+                </td>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>
+                  {editingUserId === user.id ? (
+                    <>
                       <IconButtonWithToolTip
-                        variant="secondary"
-                        icon={faTimes}
-                        tooltipText="Cancel Update"
-                        onClick={cancelUpdate}
-                        className="me-2"
-                      />
-                      <IconButtonWithToolTip
-                        variant="primary"
                         icon={faCheck}
-                        tooltipText="Confirm Update"
-                        onClick={confirmUpdate}
-                      />
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td>{user.firstName}</td>
-                    <td>{user.lastName}</td>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <IconButtonWithToolTip
-                        variant="warning"
-                        icon={faPencilAlt}
-                        tooltipText="Edit User"
-                        onClick={() => handleUpdate(user)}
-                        className="me-2"
+                        variant="secondary"
+                        tooltipText="confirm"
+                        onClick={() => handleSaveUser(user.id)}
+                        className={"me-2"}
                       />
                       <IconButtonWithToolTip
+                        icon={faTimes}
                         variant="danger"
-                        icon={faTrash}
-                        tooltipText="Delete User"
-                        onClick={() => handleDelete(user.id)}
+                        tooltipText="Cancel"
+                        onClick={handleCancelEdit}
                       />
-                    </td>
-                  </>
-                )}
+                    </>
+                  ) : (
+                    <>
+                      <IconButtonWithToolTip
+                        icon={faPencilAlt}
+                        variant="warning"
+                        tooltipText="Edit"
+                        onClick={() => handleEditClick(user)}
+                        className={"me-2"}
+                      />
+                      <IconButtonWithToolTip
+                        icon={faTrash}
+                        variant="danger"
+                        tooltipText="Delete"
+                        onClick={() => handleDeleteClick(user.id)}
+                      />
+                    </>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      <div className="d-flex justify-content-between">
+        <Button
+          className="btn btn-secondary"
+          onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 0))}
+          disabled={page === 0}
+        >
+          Previous
+        </Button>
+        <span>
+          Page {page + 1} of {totalPages}
+        </span>
+        <Button
+          className="btn btn-secondary"
+          onClick={() =>
+            setPage((prevPage) => Math.min(prevPage + 1, totalPages - 1))
+          }
+          disabled={page >= totalPages - 1}
+        >
+          Next
+        </Button>
+      </div>
+
+      {/* Error Modal */}
+      <Modal show={showErrorModal} onHide={handleCloseErrorModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{error}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseErrorModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Confirmation Modal */}
       <ConfirmationModal
-        show={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        onConfirm={confirmDelete}
+        show={showConfirmModal}
+        onHide={handleCloseConfirmModal}
+        onConfirm={handleConfirmDelete}
         message="Are you sure you want to delete this user?"
       />
     </div>
