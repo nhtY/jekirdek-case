@@ -37,6 +37,7 @@ const Sidebar = () => {
                             <>
                                 <Nav.Link as={Link} to="/user/create-customer">Create Customer</Nav.Link>
                                 <Nav.Link as={Link} to="/user/list-customers">List Customers</Nav.Link>
+                                <Nav.Link as={Link} to="/user/filter-customers-with-specs">Filter With Specs</Nav.Link>
                             </>
                         )}
                     </Nav>

@@ -8,6 +8,7 @@ import ListUsersPage from './pages/ListUsersPage';
 import CreateCustomerPage from './pages/CreateCustomerPage';
 import ListCustomersPage from './pages/ListCustomersPage';
 import NotFoundPage from './pages/NotFoundPage';
+import FilterCustomersWithSpecsPage from './pages/FilterCustomersWithSpecsPage';
 
 // Protected Route Component
 // eslint-disable-next-line react/prop-types
@@ -55,6 +56,7 @@ const AppRoutes = () => {
             >
                 <Route path="create-customer" element={<CreateCustomerPage />} />
                 <Route path="list-customers" element={<ListCustomersPage />} />
+                <Route path="filter-customers-with-specs" element={<FilterCustomersWithSpecsPage />} />
             </Route>
 
             {/* 404 Not Found Route */}

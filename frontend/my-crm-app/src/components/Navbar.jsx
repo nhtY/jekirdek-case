@@ -26,6 +26,7 @@ const AppNavbar = () => {
                             <NavDropdown title="Customer Operations" id="user-dropdown">
                                 <NavDropdown.Item as={Link} to="/user/create-customer" onClick={() => setExpanded(false)}>Create Customer</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/user/list-customers" onClick={() => setExpanded(false)}>List Customers</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/user/filter-customers-with-specs" onClick={() => setExpanded(false)}>Filter Customers With Specs</NavDropdown.Item>
                             </NavDropdown>
                         )}
                     </Nav>
