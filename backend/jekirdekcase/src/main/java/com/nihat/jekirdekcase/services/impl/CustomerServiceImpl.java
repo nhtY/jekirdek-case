@@ -76,7 +76,8 @@ public class CustomerServiceImpl implements CustomerService {
                     }
                     customer.setFirstName(updateCustomerRequest.firstName());
                     customer.setLastName(updateCustomerRequest.lastName());
-                    customer.setEmail(updateCustomerRequest.email() + "asd");
+                    customer.setEmail(updateCustomerRequest.email());
+                    customer.setRegion(updateCustomerRequest.region());
                     return customerMapper.mapToUpdateCustomerResponse(customerRepository.save(customer));
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Customer with ID " + id + " not found."));
