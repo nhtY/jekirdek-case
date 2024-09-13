@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,7 +47,7 @@ public class UserControllerTest {
 
     @Test
     void testCreateUser() throws Exception {
-        CreateUserRequest request = new CreateUserRequest("John", "Doe", "jdoe", "john.doe@example.com", "password123");
+        CreateUserRequest request = new CreateUserRequest("John", "Doe", "jdoe", "john.doe@example.com", "password123", "ROLE_USER");
         CreateUserResponse response = new CreateUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now());
 
         when(userService.saveUser(any(CreateUserRequest.class))).thenReturn(response);
