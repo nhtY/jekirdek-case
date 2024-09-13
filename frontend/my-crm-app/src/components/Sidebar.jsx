@@ -40,6 +40,7 @@ const Sidebar = () => {
                             </>
                         )}
                     </Nav>
+                    <div className='mt-auto'></div>
                 </Navbar>
             )}
         </>
