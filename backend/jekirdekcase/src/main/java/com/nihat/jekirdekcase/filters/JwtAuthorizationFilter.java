@@ -51,7 +51,7 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
 
         if (token != null && !jwtUtil.isTokenExpired(token)) {
             String username = jwtUtil.extractUsername(token);
-            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(username);
+            CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
