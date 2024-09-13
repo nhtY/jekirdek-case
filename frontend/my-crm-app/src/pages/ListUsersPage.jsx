@@ -144,16 +144,19 @@ const ListUsersPage = () => {
         <table className="table table-sm table-striped table-bordered table-hover">
         <thead className="table-dark">
             <tr>
+              <th scope="col">ID</th>
               <th scope="col">First Name</th>
               <th scope="col">Last Name</th>
               <th scope="col">Username</th>
               <th scope="col">Email</th>
+              <th scope="col">Roles</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
+                <td scope="row">{user.id}</td>
                 <td>
                   {editingUserId === user.id ? (
                     <input
@@ -180,6 +183,7 @@ const ListUsersPage = () => {
                 </td>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
+                <td>{user.roles}</td>
                 <td>
                   {editingUserId === user.id ? (
                     <>
