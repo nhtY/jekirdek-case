@@ -95,7 +95,7 @@ public class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        GetUserResponse response = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse response = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now() );
 
         when(userService.getUser(anyLong())).thenReturn(response);
 
@@ -112,8 +112,8 @@ public class UserControllerTest {
 
     @Test
     void testGetAllUsers() throws Exception {
-        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now(), LocalDateTime.now());
-        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com",  List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now() );
+        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now());
         List<GetUserResponse> users = List.of(user1, user2);
 
         when(userService.getAllUsers()).thenReturn(users);
@@ -132,8 +132,8 @@ public class UserControllerTest {
 
     @Test
     void testGetAllUsersWithPage() throws Exception {
-        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now(), LocalDateTime.now());
-        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now());
         List<GetUserResponse> users = List.of(user1, user2);
         Page<GetUserResponse> userPage = new PageImpl<>(users);
 
