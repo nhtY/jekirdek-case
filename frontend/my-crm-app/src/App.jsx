@@ -16,8 +16,9 @@ const App = () => {
                     <AppNavbar />
                     <main className="vh-100">
                         <AppRoutes />
+                        <Footer />
                     </main>
-                    <Footer />
+                    
                 </div>
             </Router>
         </AuthProvider>
