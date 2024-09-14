@@ -160,6 +160,7 @@ const ListCustomersPage = () => {
               <th scope="col">Last Name</th>
               <th scope="col">Email</th>
               <th scope="col">Region</th>
+              <th scope="col">Registration Date</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -219,37 +220,40 @@ const ListCustomersPage = () => {
                     customer.region
                   )}
                 </td>
+                <td> {new Date(customer.registrationDate).toLocaleDateString()}</td>
                 <td>
                   {editingCustomerId === customer.id ? (
                     <>
                       <IconButtonWithToolTip
                         icon={faCheck}
-                        variant="secondary"
-                        tooltipText="Confirm"
+                        variant={"success"}
+                        tooltipText={"Confirm"}
                         onClick={() => handleSaveCustomer(customer.id)}
-                        className={"me-2"}
+                        className={"btn-sm me-2"}
                       />
                       <IconButtonWithToolTip
                         icon={faTimes}
-                        variant="danger"
-                        tooltipText="Cancel"
+                        variant={"danger"}
+                        tooltipText={"Cancel"}
                         onClick={handleCancelEdit}
+                        className={"btn-sm"}
                       />
                     </>
                   ) : (
                     <>
                       <IconButtonWithToolTip
                         icon={faPencilAlt}
-                        variant="warning"
-                        tooltipText="Edit"
+                        variant={"warning"}
+                        tooltipText={"Edit"}
                         onClick={() => handleEditClick(customer)}
-                        className={"me-2"}
+                        className={"btn-sm me-2"}
                       />
                       <IconButtonWithToolTip
                         icon={faTrash}
-                        variant="danger"
-                        tooltipText="Delete"
+                        variant={"danger"}
+                        tooltipText={"Delete"}
                         onClick={() => handleDeleteClick(customer.id)}
+                        className={"btn-sm"}
                       />
                     </>
                   )}
@@ -298,8 +302,8 @@ const ListCustomersPage = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         show={showConfirmModal}
-        handleClose={handleCloseConfirmModal}
-        handleConfirm={handleConfirmDelete}
+        onClose={handleCloseConfirmModal}
+        onConfirm={handleConfirmDelete}
         title={"Confirm Delete"}
         message={"Are you sure you want to delete this customer?"}
       />
