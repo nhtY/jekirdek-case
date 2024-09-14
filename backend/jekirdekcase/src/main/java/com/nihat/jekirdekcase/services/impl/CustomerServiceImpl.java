@@ -19,18 +19,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 @Service
@@ -112,52 +112,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
-     * This method is used to stream the filtered customers via SSE.
-     * @param firstName
-     * @param lastName
-     * @param email
-     * @param region
-     * @param registrationDateStart
-     * @param registrationDateEnd
-     * @param sortBy
-     * @param sortOrder
-     * @return SseEmitter object to stream the filtered customers.
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public SseEmitter streamFilteredCustomers(String firstName, String lastName, String email, String region,
-                                              LocalDate registrationDateStart, LocalDate registrationDateEnd,
-                                              String sortBy, String sortOrder) {
-        SseEmitter emitter = new SseEmitter();
-        try (Stream<Customer> customers = customerRepository.streamAll()) {
-            log.info("Streaming filtered customers via SSE");
-
-            // Define comparator based on sorting parameters
-            Comparator<Customer> comparator = getComparator(sortBy, sortOrder);
-
-            customers.peek(entityManager::detach)
-                    .filter(customer -> matches(firstName, lastName, email, region, customer) || filterDate(registrationDateStart, registrationDateEnd, customer))
-                    .sorted(comparator) // Apply sorting
-                    .forEach(customer -> {
-                        GetCustomerResponse customerResponse = customerMapper.mapToGetCustomerResponse(customer);
-                        try {
-                            log.info("Sending customer to SSE stream: {}", customerResponse);
-                            emitter.send(customerResponse);
-                        } catch (IOException e) {
-                            emitter.completeWithError(e);
-                            throw new RuntimeException("Error writing customer to SSE stream", e);
-                        }
-                    });
-            emitter.complete();
-        } catch (Exception e) {
-            emitter.completeWithError(e);
-            throw new RuntimeException("Error filtering customers", e);
-        }
-        return emitter;
-    }
-
-    /**
-     * This method is used to make DB handle filtering operations instead of using streams and filtering in memory.
+     * This method makes DB handle filtering operations instead of using streams and filtering in memory.
      * @param firstName
      * @param lastName
      * @param email
@@ -168,7 +123,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @return Page<GetCustomerResponse> object containing the filtered customers.
      */
     @Override
-    public Page<GetCustomerResponse> getFilteredCustomers(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+    public Page<GetCustomerResponse> filterCustomersUsingSpecs(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
         // Create the Specification
         CustomerSpecification spec = new CustomerSpecification(firstName, lastName, email, region, registrationDateStart, registrationDateEnd);
 
@@ -177,52 +132,48 @@ public class CustomerServiceImpl implements CustomerService {
         return response;
     }
 
+
     /**
-     * This method is used to stream the filtered customers via OutputStream.
+     * This method handles filtering using streams. The operation is done on memory instead of the database.
      * @param firstName
      * @param lastName
      * @param email
      * @param region
      * @param registrationDateStart
      * @param registrationDateEnd
-     * @param sortBy
-     * @param sortOrder
-     * @param outputStream
+     * @param pageable
+     * @return
      */
-    @Deprecated // This method is not used in the application, because it does not provide a way to stream the data to the client.
     @Override
     @Transactional(readOnly = true)
-    public void streamFilteredCustomers(String firstName, String lastName, String email, String region,
-                                        LocalDate registrationDateStart, LocalDate registrationDateEnd,
-                                        String sortBy, String sortOrder, OutputStream outputStream) {
+    public Page<GetCustomerResponse> filterCustomersUsingStream(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+        // Initialize AtomicLong to count the total number of filtered customers
+        AtomicLong totalFilteredCount = new AtomicLong(0);
+
+        // Open the stream from the repository
         try (Stream<Customer> customers = customerRepository.streamAll()) {
-            log.info("Streaming filtered customers");
 
-            // Define comparator based on sorting parameters
-            Comparator<Customer> comparator = getComparator(sortBy, sortOrder);
+            // Build comparator using multiple sort fields
+            Comparator<Customer> comparator = buildComparator(pageable.getSort());
 
-            customers.peek(entityManager::detach)
+            // Stream filtering, sorting, and counting in one pass
+            List<GetCustomerResponse> paginatedCustomers = customers.peek(entityManager::detach)
                     .filter(customer -> {
-                        log.info("Filtering customer {}", customer.getFirstName());
-                        // filter the customers
-                        return matches(firstName, lastName, email, region, customer) || filterDate(registrationDateStart, registrationDateEnd, customer);
-                    })
-                    .sorted(comparator) // Apply sorting
-                    .forEach(customer -> {
-                        log.info("Mapping customer {}", customer.getFirstName());
-                        GetCustomerResponse customerResponse = customerMapper.mapToGetCustomerResponse(customer);
-                        try {
-                            log.info("Writing customer to output stream {}", customerResponse);
-                            // Write each filtered customer to the output stream as JSON
-                            objectMapper.writeValue(outputStream, customerResponse);
-                            outputStream.write("\n".getBytes()); // Add a newline to separate JSON objects (new-line separated json)
-                            outputStream.flush();
-                        } catch (Exception e) {
-                            throw new RuntimeException("Error writing customer to output stream", e);
+                        boolean matches = matches(firstName, lastName, email, region, customer)
+                                && filterDate(registrationDateStart, registrationDateEnd, customer);
+                        if (matches) {
+                            totalFilteredCount.incrementAndGet(); // Increment the counter if the customer matches
                         }
-                    });
-        } catch (Exception e) {
-            throw new RuntimeException("Error filtering customers", e);
+                        return matches;
+                    })
+                    .sorted(comparator)  // Apply sorting
+                    .skip(pageable.getOffset())   // Apply pagination: skip to the correct page
+                    .limit(pageable.getPageSize())  // Limit to the page size
+                    .map(customerMapper::mapToGetCustomerResponse)
+                    .toList();
+
+            // Create and return a Page object with the filtered data and total count
+            return new PageImpl<>(paginatedCustomers, pageable, totalFilteredCount.get());
         }
     }
 
@@ -277,26 +228,39 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
-     *
-     * @param sortBy
-     * @param sortOrder
-     * @return a Comparator object. By default, it compares based on the id of the Customer.
+     * Builds a comparator based on multiple sorting fields.
+     * @param sort the Sort object containing multiple sorting orders
+     * @return a chained Comparator that applies sorting based on the specified fields and directions
      */
-    private Comparator<Customer> getComparator(String sortBy, String sortOrder) {
-        Comparator<Customer> comparator = Comparator.comparing(Customer::getId);
+    private Comparator<Customer> buildComparator(Sort sort) {
+        Comparator<Customer> comparator = Comparator.comparing(Customer::getId); // Default comparator
 
-        if ("firstName".equalsIgnoreCase(sortBy)) {
-            comparator = Comparator.comparing(Customer::getFirstName);
-        } else if ("lastName".equalsIgnoreCase(sortBy)) {
-            comparator = Comparator.comparing(Customer::getLastName);
-        } else if ("email".equalsIgnoreCase(sortBy)) {
-            comparator = Comparator.comparing(Customer::getEmail);
-        } else if ("registrationDate".equalsIgnoreCase(sortBy)) {
-            comparator = Comparator.comparing(Customer::getRegistrationDate);
-        }
+        // Iterate over each Sort.Order and build the comparator
+        for (Sort.Order order : sort) {
+            String property = order.getProperty();
+            boolean ascending = order.isAscending();
 
-        if ("desc".equalsIgnoreCase(sortOrder)) {
-            comparator = comparator.reversed();
+            // Build comparator based on the field to be sorted
+            Comparator<Customer> fieldComparator;
+            if ("firstName".equalsIgnoreCase(property)) {
+                fieldComparator = Comparator.comparing(Customer::getFirstName, String.CASE_INSENSITIVE_ORDER);
+            } else if ("lastName".equalsIgnoreCase(property)) {
+                fieldComparator = Comparator.comparing(Customer::getLastName, String.CASE_INSENSITIVE_ORDER);
+            } else if ("email".equalsIgnoreCase(property)) {
+                fieldComparator = Comparator.comparing(Customer::getEmail, String.CASE_INSENSITIVE_ORDER);
+            } else if ("registrationDate".equalsIgnoreCase(property)) {
+                fieldComparator = Comparator.comparing(Customer::getRegistrationDate);
+            } else {
+                fieldComparator = Comparator.comparing(Customer::getId);  // Default to sorting by ID
+            }
+
+            // Apply ascending/descending order
+            if (!ascending) {
+                fieldComparator = fieldComparator.reversed();
+            }
+
+            // Chain comparators using thenComparing
+            comparator = comparator.thenComparing(fieldComparator);
         }
 
         return comparator;
