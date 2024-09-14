@@ -9,6 +9,7 @@ import CreateCustomerPage from './pages/CreateCustomerPage';
 import ListCustomersPage from './pages/ListCustomersPage';
 import NotFoundPage from './pages/NotFoundPage';
 import FilterCustomersWithSpecsPage from './pages/FilterCustomersWithSpecsPage';
+import FilterCustomersWithStreamPage from './pages/FilterCustomersWithStream';
 
 // Protected Route Component
 // eslint-disable-next-line react/prop-types
@@ -36,7 +37,7 @@ const AppRoutes = () => {
             <Route
                 path="/admin"
                 element={
-                    <PrivateRoute allowedRoles={['ADMIN']}>
+                    <PrivateRoute allowedRoles={['ROLE_ADMIN']}>
                         <AdminDashboard />
                     </PrivateRoute>
                 }
@@ -49,7 +50,7 @@ const AppRoutes = () => {
             <Route
                 path="/user"
                 element={
-                    <PrivateRoute allowedRoles={['USER']}>
+                    <PrivateRoute allowedRoles={['ROLE_USER']}>
                         <UserDashboard />
                     </PrivateRoute>
                 }
@@ -57,6 +58,7 @@ const AppRoutes = () => {
                 <Route path="create-customer" element={<CreateCustomerPage />} />
                 <Route path="list-customers" element={<ListCustomersPage />} />
                 <Route path="filter-customers-with-specs" element={<FilterCustomersWithSpecsPage />} />
+                <Route path="filter-customers-with-stream" element={<FilterCustomersWithStreamPage />} />
             </Route>
 
             {/* 404 Not Found Route */}
