@@ -12,14 +12,22 @@ const App = () => {
     return (
         <AuthProvider>
             <Router>
-                <div className="d-flex flex-column min-vh-100">
+                
+                <AppNavbar />
+                <div className='container-fluid'>
+                    <AppRoutes />
+                </div>
+                <footer className='sticky-bottom'>
+                    <Footer />
+                </footer>
+                {/* <div className="d-flex flex-column min-vh-100">
                     <AppNavbar />
                     <main className="vh-100">
                         <AppRoutes />
                         <Footer />
                     </main>
                     
-                </div>
+                </div> */}
             </Router>
         </AuthProvider>
     );
