@@ -1,44 +1,46 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Navbar, Nav, Container, Button, NavDropdown } from 'react-bootstrap';
-import { useAuth } from '../hooks/useAuth';
+import { useState } from "react";
+
+import { useAuth } from "../hooks/useAuth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 const AppNavbar = () => {
-    const { isLoggedIn, role, logout } = useAuth();
-    const [expanded, setExpanded] = useState(false); // State to control collapse behavior
+  const { isLoggedIn, role, logout } = useAuth();
+  console.log(isLoggedIn, role);
 
-    return (
-        <Navbar bg="dark" variant="dark" expand="sm" expanded={expanded} onToggle={() => setExpanded(!expanded)}>
-            <Container>
-                <Navbar.Brand as={Link} to="/">
-                    CompanyName
-                </Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={() => setExpanded(!expanded)} />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                        {isLoggedIn && role === 'ADMIN' && (
-                            <NavDropdown title="User Operations" id="admin-dropdown">
-                                <NavDropdown.Item as={Link} to="/admin/create-user" onClick={() => setExpanded(false)}>Create User</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/admin/list-users" onClick={() => setExpanded(false)}>List Users</NavDropdown.Item>
-                            </NavDropdown>
-                        )}
-                        {isLoggedIn && role === 'USER' && (
-                            <NavDropdown title="Customer Operations" id="user-dropdown">
-                                <NavDropdown.Item as={Link} to="/user/create-customer" onClick={() => setExpanded(false)}>Create Customer</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/user/list-customers" onClick={() => setExpanded(false)}>List Customers</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/user/filter-customers-with-specs" onClick={() => setExpanded(false)}>Filter Customers With Specs</NavDropdown.Item>
-                            </NavDropdown>
-                        )}
-                    </Nav>
-                    {isLoggedIn && (
-                        <Button variant="outline-light" onClick={() => { setExpanded(false); logout(); }}>
-                            Logout
-                        </Button>
-                    )}
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
-    );
+  function handleLogout() {
+    logout();
+  }
+
+  return (
+    <header
+      className="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow"
+      data-bs-theme="dark"
+    >
+      <a
+        className="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white"
+        href="#"
+      >
+        Company name
+      </a>
+
+      <ul className="navbar-nav flex-row d-md-none">
+        <li className="nav-item text-nowrap">
+          <button
+            className="nav-link px-3 text-white"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+        </li>
+      </ul>
+    </header>
+  );
 };
 
 export default AppNavbar;
