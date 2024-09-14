@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,40 +59,12 @@ public class CustomerController implements CustomerControllerDocs {
     }
 
     @Override
-    public SseEmitter streamCustomers(
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String region,
-            @RequestParam(required = false) LocalDate registrationDateStart,
-            @RequestParam(required = false) LocalDate registrationDateEnd,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String sortOrder) {
-        // Delegate to service layer to stream customers
-        return customerService.streamFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, sortBy, sortOrder);
+    public ResponseEntity<Page<GetCustomerResponse>> filterCustomers(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+        return ResponseEntity.ok(customerService.filterCustomersUsingStream(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, pageable));
     }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> filterCustomers(String firstName, String lastName, String email,
-                                                                 String region, LocalDate registrationDateStart,
-                                                                 LocalDate registrationDateEnd,
-                                                                 String sortBy, String sortOrder) {
-        // StreamingResponseBody that streams the filtered customers
-        StreamingResponseBody stream = outputStream -> {
-            customerService.streamFilteredCustomers(firstName, lastName, email, region,
-                    registrationDateStart, registrationDateEnd, sortBy, sortOrder, outputStream);
-            outputStream.flush();
-            outputStream.close();
-        };
-
-        return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
-                .body(stream);
-    }
-
 
     @Override
     public Page<GetCustomerResponse> getFilteredCustomersWithSpecs(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
-        return customerService.getFilteredCustomers(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, pageable);
+        return customerService.filterCustomersUsingSpecs(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, pageable);
     }
 }
