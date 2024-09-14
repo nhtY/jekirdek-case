@@ -220,7 +220,7 @@ public class CustomerServiceImpl implements CustomerService {
             return (customer.getRegistrationDate().isAfter(startOfDay) || customer.getRegistrationDate().isEqual(startOfDay)) && (customer.getRegistrationDate().isBefore(endOfDay) || customer.getRegistrationDate().isEqual(endOfDay));
         }
 
-        return false;
+        return true;
     }
     
     private boolean isNullOrEmptyOrBlank(String str) {
@@ -248,6 +248,8 @@ public class CustomerServiceImpl implements CustomerService {
                 fieldComparator = Comparator.comparing(Customer::getLastName, String.CASE_INSENSITIVE_ORDER);
             } else if ("email".equalsIgnoreCase(property)) {
                 fieldComparator = Comparator.comparing(Customer::getEmail, String.CASE_INSENSITIVE_ORDER);
+            } else if ("region".equalsIgnoreCase(property)) {
+                fieldComparator = Comparator.comparing(Customer::getRegion, String.CASE_INSENSITIVE_ORDER);
             } else if ("registrationDate".equalsIgnoreCase(property)) {
                 fieldComparator = Comparator.comparing(Customer::getRegistrationDate);
             } else {
