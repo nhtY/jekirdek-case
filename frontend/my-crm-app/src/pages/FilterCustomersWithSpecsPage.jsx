@@ -152,7 +152,7 @@ const FilterCustomersWithSpecsPage = () => {
   }, [page, pageSize, sort]);
 
   return (
-    <div className="container-fluid">
+    <div className="">
       <h3>Filter Customers With Specifications</h3>
         <p>The backend uses Spring Data JPA's Specifications to build the SQL query for filtering and the filtering operations happens on <b>DB</b></p>
     
@@ -241,6 +241,7 @@ const FilterCustomersWithSpecsPage = () => {
         </Button>
       </Form>
 
+      <div className="container">
       <div className="row mb-3">
         <div className="col">
           <label>Page Size: </label>
@@ -271,6 +272,7 @@ const FilterCustomersWithSpecsPage = () => {
             <option value="region,desc">Region Descending</option>
           </select>
         </div>
+      </div>
       </div>
 
       <div className="table-responsive">
@@ -351,12 +353,16 @@ const FilterCustomersWithSpecsPage = () => {
                       <IconButtonWithToolTip
                         onClick={() => handleSaveCustomer(customer.id)}
                         icon={faCheck}
-                        toolTipText="Save"
+                        tooltipText="Save"
+                        variant={"success"}
+                        className="btn-sm me-2"
                       />
                       <IconButtonWithToolTip
                         onClick={handleCancelEdit}
                         icon={faTimes}
-                        toolTipText="Cancel"
+                        tooltipText={"Cancel"}
+                        variant={"danger"}
+                        className={"btn-sm"}
                       />
                     </>
                   ) : (
@@ -364,12 +370,16 @@ const FilterCustomersWithSpecsPage = () => {
                       <IconButtonWithToolTip
                         onClick={() => handleEditClick(customer)}
                         icon={faPencilAlt}
-                        toolTipText="Edit"
+                        tooltipText={"Edit"}
+                        variant={"warning"}
+                        className={"btn-sm me-2"}
                       />
                       <IconButtonWithToolTip
                         onClick={() => handleDeleteClick(customer.id)}
                         icon={faTrash}
-                        toolTipText="Delete"
+                        tooltipText={"Delete"}
+                        variant={"danger"}
+                        className={"btn-sm"}
                       />
                     </>
                   )}
@@ -413,7 +423,7 @@ const FilterCustomersWithSpecsPage = () => {
       <ConfirmationModal
         show={showConfirmModal}
         onConfirm={handleConfirmDelete}
-        onCancel={handleCloseConfirmModal}
+        onClose={handleCloseConfirmModal}
         message="Are you sure you want to delete this customer?"
       />
     </div>
