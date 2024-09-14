@@ -13,11 +13,11 @@ const LoginPage = () => {
 
     const handleLogin = () => {
         if (email === 'admin@email.com' && password === 'admin.pass1') {
-            login({ email }, 'ADMIN', 'admin-token');
-            navigate('/admin');
+            login({ email }, 'ROLE_ADMIN', 'admin-token');
+            navigate('/admin/list-users');
         } else if (email === 'user@email.com' && password === 'user.pass1') {
-            login({ email }, 'USER', 'user-token');
-            navigate('/user');
+            login({ email }, 'ROLE_USER', 'user-token');
+            navigate('/user/filter-customers-with-specs');
         } else {
             setModalProps({
                 show: true,
