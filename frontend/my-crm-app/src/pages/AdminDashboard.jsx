@@ -3,10 +3,10 @@ import Sidebar from '../components/Sidebar';
 
 const AdminDashboard = () => {
     return (
-        <div className="d-flex" style={{ minHeight: '100vh' }}>
+        <div className="row min-vh-100">
             <Sidebar />
-            <div className="container-fluid container-xxl" style={{minHeight: '100%'}}>
-                <h2>Admin Dashboard</h2>
+            <div className='col-md-9 ms-sm-auto col-lg-10 px-md-4'>
+                {/* <h2>Admin Dashboard</h2> */}
                 {/* Main content*/}
                 <Outlet />
             </div>
