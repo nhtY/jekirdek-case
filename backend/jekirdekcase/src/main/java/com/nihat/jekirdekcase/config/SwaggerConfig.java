@@ -45,6 +45,11 @@ public class SwaggerConfig {
                                         .type(SecurityScheme.Type.APIKEY)
                                         .in(SecurityScheme.In.COOKIE)
                                         .name("X-Cookie-Auth"))
+                        .addHeaders("device-os",
+                                new io.swagger.v3.oas.models.headers.Header()
+                                        .description("The operating system of the device")
+                                        .schema(new io.swagger.v3.oas.models.media.StringSchema())
+                        )
                 )
                 .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
                 .addSecurityItem(new SecurityRequirement().addList("custom-header"))
