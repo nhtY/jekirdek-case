@@ -263,7 +263,7 @@ const ListUsersPage = () => {
       {/* Confirmation Modal */}
       <ConfirmationModal
         show={showConfirmModal}
-        onHide={handleCloseConfirmModal}
+        onClose={handleCloseConfirmModal}
         onConfirm={handleConfirmDelete}
         message="Are you sure you want to delete this user?"
       />

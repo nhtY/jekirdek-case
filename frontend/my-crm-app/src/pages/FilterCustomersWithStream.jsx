@@ -277,6 +277,7 @@ const FilterCustomersWithStreamPage = () => {
               <th scope="col">Last Name</th>
               <th scope="col">Email</th>
               <th scope="col">Region</th>
+              <th scope="col">Registration Date</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -338,6 +339,7 @@ const FilterCustomersWithStreamPage = () => {
                     customer.region
                   )}
                 </td>
+                <td> {new Date(customer.registrationDate).toLocaleDateString()}</td>
                 <td>
                   {editingCustomerId === customer.id ? (
                     <>
