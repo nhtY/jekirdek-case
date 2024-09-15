@@ -1,10 +1,12 @@
 import axios from "axios";
 
 axios.defaults.baseURL = "http://localhost:8080/api/v1"; // backend URL
+axios.defaults.withCredentials = true; // This ensures cookies are sent with each request
 // Set up Axios interceptors for custom headers
 axios.interceptors.request.use(
   (config) => {
     const browser = getBrowser();
+    console.log("is browser: ", browser)
 
     config.headers["device-os"] = browser !== 'Unknown'? 'Browser' : 'No-info';
 
