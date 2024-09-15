@@ -4,6 +4,7 @@ import com.nihat.jekirdekcase.controllers.docs.AuthControllerDocs;
 import com.nihat.jekirdekcase.services.AuthenticationService;
 import com.nihat.jekirdekcase.dtos.requests.LoginRequest;
 import com.nihat.jekirdekcase.dtos.responses.CurrentUserResponse;
+import com.nihat.jekirdekcase.utils.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,11 +20,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController implements AuthControllerDocs {
 
     private final AuthenticationService authenticationService;
+    private final JwtUtil jwtUtil;
 
     @Override
-    public ResponseEntity<String> login(LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<String> login(LoginRequest loginRequest, HttpServletResponse response, @RequestHeader("device-os") String deviceOs) {
         String token = authenticationService.login(loginRequest.email(), loginRequest.password(), response);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok("device-os".equals(deviceOs) ? token : null);
     }
 
     @Override
@@ -36,10 +38,13 @@ public class AuthenticationController implements AuthControllerDocs {
     public ResponseEntity<CurrentUserResponse> getCurrentUser(HttpServletRequest request) {
         // Extract token from cookies
         String token = null;
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("authToken")) {
-                token = cookie.getValue();
-                break;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (jwtUtil.getCookieName().equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
             }
         }
 
