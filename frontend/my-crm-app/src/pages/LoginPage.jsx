@@ -1,40 +1,43 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import axios from '../axios/axios'; // Ensure this is the correct path for axios
+import axios from 'axios';
 import NotificationModal from '../components/NotificationModal';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [modalProps, setModalProps] = useState({ show: false, message: '', type: 'info' });
+    const [modalProps, setModalProps] = useState({ show: false, message: '', type: 'info' }); // State to control modal visibility and content
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('/auth/login', { email, password });
-            
-            // If login is successful, fetch the current user data and update state
-            const userData = await axios.get('/auth/current-user');
-            const { username, authorities } = userData.data;
+            const response = await axios.post('/auth/login', {
+                email,
+                password,
+            });
 
-            login({ email: username }, authorities[0]); // Update role based on server response
+            // If login is successful, call login function in AuthContext
+            if (response.status === 200) {
+                // Fetch current user after successful login
+                const currentUserResponse = await axios.get('/auth/current-user');
+                const { username, authorities } = currentUserResponse.data;
+                console.log("current response: ", username, authorities)
 
-            // Redirect based on role
-            if (authorities.includes('ROLE_ADMIN')) {
-                navigate('/admin/list-users');
-            } else {
-                navigate('/user/filter-customers-with-stream');
+                login(username, authorities[0]); // Update context with user info
+
+                // Redirect to the appropriate dashboard
+                navigate(authorities[0] === 'ROLE_ADMIN' ? '/admin/list-users' : '/user/filter-customers-with-stream');
             }
-
         } catch (error) {
-            console.log("AUTH ERROR: ", error)
+            console.log("login error: ", error)
+            const message = error.response? error.response.data.message : error.message
             setModalProps({
                 show: true,
-                message: 'Invalid credentials. Please try again.',
-                type: 'error',
+                message: message || 'Invalid credentials. Please try again.',
+                type: 'error'
             });
         }
     };
@@ -88,7 +91,6 @@ const LoginPage = () => {
                 </div>
             </div>
 
-            {/* Notification Modal */}
             <NotificationModal
                 show={modalProps.show}
                 onClose={() => setModalProps({ ...modalProps, show: false })}
