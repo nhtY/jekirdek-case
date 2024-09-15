@@ -1,16 +1,12 @@
-import { useState } from "react";
 
 import { useAuth } from "../hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 const AppNavbar = () => {
-  const { isLoggedIn, role, logout } = useAuth();
-  console.log(isLoggedIn, role);
+  const { isLoggedIn, user, role } = useAuth();
+  console.log("IS LOGGED IN? ", isLoggedIn);
 
-  function handleLogout() {
-    logout();
-  }
 
   return (
     <header
@@ -24,21 +20,23 @@ const AppNavbar = () => {
         Company name
       </a>
 
-      <ul className="navbar-nav flex-row d-md-none">
-        <li className="nav-item text-nowrap">
-          <button
-            className="nav-link px-3 text-white"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#sidebarMenu"
-            aria-controls="sidebarMenu"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </button>
-        </li>
-      </ul>
+      {isLoggedIn && (
+        <ul className="navbar-nav flex-row d-md-none">
+          <li className="nav-item text-nowrap">
+            <button
+              className="nav-link px-3 text-white"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#sidebarMenu"
+              aria-controls="sidebarMenu"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </button>
+          </li>
+        </ul>
+      )}
     </header>
   );
 };
