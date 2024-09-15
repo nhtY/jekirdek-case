@@ -1,28 +1,40 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import axios from '../axios/axios'; // Ensure this is the correct path for axios
 import NotificationModal from '../components/NotificationModal';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [modalProps, setModalProps] = useState({ show: false, message: '', type: 'info' }); // State to control modal visibility and content
+    const [modalProps, setModalProps] = useState({ show: false, message: '', type: 'info' });
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        if (email === 'admin@email.com' && password === 'admin.pass1') {
-            login({ email }, 'ROLE_ADMIN', 'admin-token');
-            navigate('/admin/list-users');
-        } else if (email === 'user@email.com' && password === 'user.pass1') {
-            login({ email }, 'ROLE_USER', 'user-token');
-            navigate('/user/filter-customers-with-specs');
-        } else {
+    const handleLogin = async () => {
+        try {
+            const response = await axios.post('/auth/login', { email, password });
+            
+            // If login is successful, fetch the current user data and update state
+            const userData = await axios.get('/auth/current-user');
+            const { username, authorities } = userData.data;
+
+            login({ email: username }, authorities[0]); // Update role based on server response
+
+            // Redirect based on role
+            if (authorities.includes('ROLE_ADMIN')) {
+                navigate('/admin/list-users');
+            } else {
+                navigate('/user/filter-customers-with-stream');
+            }
+
+        } catch (error) {
+            console.log("AUTH ERROR: ", error)
             setModalProps({
                 show: true,
                 message: 'Invalid credentials. Please try again.',
-                type: 'error'
+                type: 'error',
             });
         }
     };
@@ -76,7 +88,7 @@ const LoginPage = () => {
                 </div>
             </div>
 
-            {/* Use NotificationModal */}
+            {/* Notification Modal */}
             <NotificationModal
                 show={modalProps.show}
                 onClose={() => setModalProps({ ...modalProps, show: false })}
