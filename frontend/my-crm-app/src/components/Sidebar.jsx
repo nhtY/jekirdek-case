@@ -2,11 +2,16 @@ import { Nav } from "react-bootstrap";
 import { useAuth } from "../hooks/useAuth"; // Import the custom hook
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  faFilter, faList, faPlusCircle, faSignOut } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFilter,
+  faList,
+  faPlusCircle,
+  faSignOut,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
-  const { role, isLoggedIn, logout } = useAuth(); // Get role and isLoggedIn status from AuthContext
+  const { role, isLoggedIn, user, logout } = useAuth(); // Get role and isLoggedIn status from AuthContext
   console.log(role, isLoggedIn);
 
   const handleLogout = () => {
@@ -73,7 +78,7 @@ const Sidebar = () => {
                   to="/user/create-customer"
                   className="d-flex align-items-center gap-2"
                 >
-                    <FontAwesomeIcon icon={faPlusCircle} />
+                  <FontAwesomeIcon icon={faPlusCircle} />
                   Create Customer
                 </Nav.Link>
                 <Nav.Link
@@ -81,7 +86,7 @@ const Sidebar = () => {
                   to="/user/list-customers"
                   className="d-flex align-items-center gap-2"
                 >
-                    <FontAwesomeIcon icon={faList} />
+                  <FontAwesomeIcon icon={faList} />
                   List Customers
                 </Nav.Link>
                 <Nav.Link
@@ -89,7 +94,7 @@ const Sidebar = () => {
                   to="/user/filter-customers-with-stream"
                   className="d-flex align-items-center gap-2"
                 >
-                    <FontAwesomeIcon icon={faFilter} />
+                  <FontAwesomeIcon icon={faFilter} />
                   Filter With Stream
                 </Nav.Link>
                 <Nav.Link
@@ -97,12 +102,16 @@ const Sidebar = () => {
                   to="/user/filter-customers-with-specs"
                   className="d-flex align-items-center gap-2"
                 >
-                    <FontAwesomeIcon icon={faFilter} />
+                  <FontAwesomeIcon icon={faFilter} />
                   Filter With JPA Specs
                 </Nav.Link>
               </>
             )}
-            <hr className="my-3" />
+            <hr className="my-1" />
+            <li className="nav-item text-nowrap">
+              <span className="nav-link text-dark px-3">{`${user}`}</span>
+            </li>
+            <hr className="my-1" />
             <li className="nav-item">
               <Nav.Link
                 as={Link}
