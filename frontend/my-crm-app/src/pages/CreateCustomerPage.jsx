@@ -76,7 +76,7 @@ const CreateCustomerPage = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
-      <div className="card shadow-lg rounded" style={{ width: "40%", padding: "2rem", backgroundColor: "#f9f9f9" }}>
+      <div className="card shadow-lg rounded" style={{ width: "80%", padding: "2rem", backgroundColor: "#f9f9f9" }}>
         <h3 className="text-center mb-4">Create Customer</h3>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="firstName">
