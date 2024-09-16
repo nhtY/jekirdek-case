@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,10 @@ public class AuthenticationController implements AuthControllerDocs {
         return ResponseEntity.ok().build();
     }
 
+
+    // ADMIN or USER role required
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<CurrentUserResponse> getCurrentUser(HttpServletRequest request) {
         // Extract token from cookies
         String token = null;
