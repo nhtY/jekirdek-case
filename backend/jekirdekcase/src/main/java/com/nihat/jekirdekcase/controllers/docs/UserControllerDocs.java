@@ -12,14 +12,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Tag(name = "User Management", description = "Operations related to managing users")
+@Validated
 public interface UserControllerDocs {
 
     @Operation(
@@ -52,7 +55,7 @@ public interface UserControllerDocs {
             }
     )
     @PostMapping
-    ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest createUserRequest);
+    ResponseEntity<CreateUserResponse> createUser(@Valid  @RequestBody CreateUserRequest createUserRequest);
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
@@ -94,7 +97,7 @@ public interface UserControllerDocs {
             }
     )
     @PutMapping("/{id}")
-    ResponseEntity<UpdateUserResponse> updateUser(@RequestBody UpdateUserRequest updateUserRequest, @PathVariable Long id);
+    ResponseEntity<UpdateUserResponse> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest, @PathVariable Long id);
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
