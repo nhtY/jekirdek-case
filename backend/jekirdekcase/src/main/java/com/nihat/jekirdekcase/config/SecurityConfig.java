@@ -47,8 +47,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()  // Public paths
-                                .anyRequest().permitAll()
-//                        .anyRequest().authenticated()  // Secure all other requests
+//                                .anyRequest().permitAll()
+                                .requestMatchers("/api/v1/users/**").hasRole("ADMIN")  // Secure all other requests
+                        .anyRequest().authenticated()  // Secure all other requests
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Set stateless session
