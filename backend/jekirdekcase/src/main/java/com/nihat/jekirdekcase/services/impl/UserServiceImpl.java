@@ -10,15 +10,19 @@ import com.nihat.jekirdekcase.exceptions.AlreadyExistsException;
 import com.nihat.jekirdekcase.exceptions.ResourceNotFoundException;
 import com.nihat.jekirdekcase.logging.Loggable;
 import com.nihat.jekirdekcase.mappers.UserMapper;
+import com.nihat.jekirdekcase.repositories.AppRoleRepository;
 import com.nihat.jekirdekcase.repositories.UserRepository;
 import com.nihat.jekirdekcase.services.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +31,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final AppRoleRepository appRoleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public CreateUserResponse saveUser(CreateUserRequest createUserRequest) {
+        User user = userMapper.mapToUser(createUserRequest);
+        user.setRoles(Set.of(appRoleRepository.findByRoleName(createUserRequest.roleName())));
+        user.setPassword(passwordEncoder.encode(createUserRequest.password()));
         try {
-            return userMapper.mapToCreateUserResponse(userRepository.save(userMapper.mapToUser(createUserRequest)));
+            return userMapper.mapToCreateUserResponse(userRepository.save(user));
         } catch (DataIntegrityViolationException e) {
             throw throwAlreadyExistsExceptionForUserCreation(createUserRequest.username(), createUserRequest.email());
         }

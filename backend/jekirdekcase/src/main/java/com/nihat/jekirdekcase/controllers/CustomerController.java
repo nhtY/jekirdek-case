@@ -12,8 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -52,5 +56,15 @@ public class CustomerController implements CustomerControllerDocs {
     @Override
     public ResponseEntity<Page<GetCustomerResponse>> getAllCustomers(Pageable pageable) {
         return ResponseEntity.ok(customerService.getAllCustomers(pageable));
+    }
+
+    @Override
+    public ResponseEntity<Page<GetCustomerResponse>> filterCustomers(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+        return ResponseEntity.ok(customerService.filterCustomersUsingStream(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, pageable));
+    }
+
+    @Override
+    public Page<GetCustomerResponse> getFilteredCustomersWithSpecs(String firstName, String lastName, String email, String region, LocalDate registrationDateStart, LocalDate registrationDateEnd, Pageable pageable) {
+        return customerService.filterCustomersUsingSpecs(firstName, lastName, email, region, registrationDateStart, registrationDateEnd, pageable);
     }
 }

@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,7 +47,7 @@ public class UserControllerTest {
 
     @Test
     void testCreateUser() throws Exception {
-        CreateUserRequest request = new CreateUserRequest("John", "Doe", "jdoe", "john.doe@example.com", "password123");
+        CreateUserRequest request = new CreateUserRequest("John", "Doe", "jdoe", "john.doe@example.com", "password123", "ROLE_USER");
         CreateUserResponse response = new CreateUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now());
 
         when(userService.saveUser(any(CreateUserRequest.class))).thenReturn(response);
@@ -96,7 +95,7 @@ public class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        GetUserResponse response = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse response = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now() );
 
         when(userService.getUser(anyLong())).thenReturn(response);
 
@@ -113,8 +112,8 @@ public class UserControllerTest {
 
     @Test
     void testGetAllUsers() throws Exception {
-        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now(), LocalDateTime.now());
-        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com",  List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now() );
+        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now());
         List<GetUserResponse> users = List.of(user1, user2);
 
         when(userService.getAllUsers()).thenReturn(users);
@@ -133,8 +132,8 @@ public class UserControllerTest {
 
     @Test
     void testGetAllUsersWithPage() throws Exception {
-        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", LocalDateTime.now(), LocalDateTime.now());
-        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse user1 = new GetUserResponse(1L, "John", "Doe", "jdoe", "john.doe@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now());
+        GetUserResponse user2 = new GetUserResponse(2L, "Jane", "Smith", "jsmith", "jane.smith@example.com", List.of("ROLE_USER"), LocalDateTime.now(), LocalDateTime.now());
         List<GetUserResponse> users = List.of(user1, user2);
         Page<GetUserResponse> userPage = new PageImpl<>(users);
 
