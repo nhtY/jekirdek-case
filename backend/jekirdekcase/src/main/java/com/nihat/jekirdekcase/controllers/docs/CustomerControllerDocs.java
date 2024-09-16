@@ -12,9 +12,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -23,6 +25,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "Customer Management", description = "Operations related to managing customers")
+@Validated
 public interface CustomerControllerDocs {
 
     @Operation(
@@ -55,7 +58,7 @@ public interface CustomerControllerDocs {
             }
     )
     @PostMapping
-    ResponseEntity<CreateCustomerResponse> createCustomer(@RequestBody CreateCustomerRequest createCustomerRequest);
+    ResponseEntity<CreateCustomerResponse> createCustomer(@Valid @RequestBody CreateCustomerRequest createCustomerRequest);
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
@@ -97,7 +100,7 @@ public interface CustomerControllerDocs {
             }
     )
     @PutMapping("/{id}")
-    ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestBody UpdateCustomerRequest updateCustomerRequest, @PathVariable Long id);
+    ResponseEntity<UpdateCustomerResponse> updateCustomer(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest, @PathVariable Long id);
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(

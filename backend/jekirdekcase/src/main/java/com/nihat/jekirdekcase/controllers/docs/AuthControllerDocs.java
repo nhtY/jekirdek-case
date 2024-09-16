@@ -6,13 +6,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "Authentication")
+@Validated
 public interface AuthControllerDocs {
 
     @Operation(
@@ -41,7 +44,7 @@ public interface AuthControllerDocs {
             }
     )
     @PostMapping("/login")
-    ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response, @RequestHeader("device-os") String deviceOs);
+    ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response, @RequestHeader("device-os") String deviceOs);
     // -----------------------------------------------------------------------------------------------------------------
 
     @Operation(
