@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
 import NotificationModal from '../components/NotificationModal';
+import { useError } from '../context/ErrorContext';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [modalProps, setModalProps] = useState({ show: false, message: '', type: 'info' }); // State to control modal visibility and content
     const { login } = useAuth();
+    const { triggerError } = useError(); // Use triggerError from ErrorContext
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -34,11 +36,15 @@ const LoginPage = () => {
         } catch (error) {
             console.log("login error: ", error)
             const message = error.response? error.response.data.message : error.message
-            setModalProps({
-                show: true,
-                message: message || 'Invalid credentials. Please try again.',
-                type: 'error'
+            triggerError(message || 'Invalid credentials. Please try again.', () => {
+                setEmail('');
+                setPassword('');
             });
+            // setModalProps({
+            //     show: true,
+            //     message: message || 'Invalid credentials. Please try again.',
+            //     type: 'error'
+            // });
         }
     };
 
