@@ -72,7 +72,7 @@ public class CustomExceptionHandler {
         if (ex instanceof PropertyReferenceException) {
             message = ((PropertyReferenceException) ex).getMessage();
         } else if (ex instanceof BadCredentialsException) {
-            message = ((BadCredentialsException) ex).getMessage();
+            message = ((BadCredentialsException) ex).getMessage() + ". Please check your credentials.";
         } else {
             message = "An unexpected error occurred.";
         }
